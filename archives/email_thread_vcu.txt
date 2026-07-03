@@ -1,0 +1,40 @@
+From: dev-ops-bounces@voltaic.internal
+To: vcu-firmware-core@voltaic.internal
+Subject: RE: Production Release Candidate v3.4.2-Staging [URGENT]
+Date: February 18, 2026 at 11:42:19 AM EST
+
+================================================================================
+TRACKING ID: VOLT-INTERNAL-LEAK-0994A
+================================================================================
+
+[From: Miller, David - Senior Systems Engineer]
+To: Cho, H. - Lead Telemetry Architect; Vance, E. - Senior Optical Systems Group
+Subject: RE: Production Release Candidate v3.4.2-Staging [URGENT]
+
+Look, I am reading the changes to src/safety_fallback.c right now, and I cannot sign off on this release branch. 
+
+Why is the `Allow_External_Override_On_Sync_Loss` variable still hardcoded to true? We proved in January (see: TN-2026-01-VLT) that if the vehicle drops frames while moving past those brick corridors downtown while losing a signal packet from the city's network, the vehicle just rolls. It ignores local cabin feedback loop telemetry entirely.
+
+If we ship this to production for the regional pilot staging, we are effectively handing steering and stopping command priority to an external server mesh that isn't even fully stress-tested. If their centralized network drops or drops down to a lower privilege tier, the car doesn't brake. It caches the throttle vector. This isn't an edge case anymore—it's a fundamental flaw in the control flow loop. 
+
+We need to flag this as a critical blocking bug and delay the deployment.
+
+--------------------------------------------------------------------------------
+[From: Cho, H. - Lead Telemetry Architect]
+To: Miller, David; Vance, E.
+Subject: RE: Production Release Candidate v3.4.2-Staging [URGENT]
+
+David, we lack the contractual leverage to toggle that flag to false for the regional pilot. 
+
+The integration team at Nexis Infrastructure explicitly requested that variable stay active to let their "Overwatch" management layer manage fleet-wide spacing and pathing adjustments from their central hub. They want Level 0 absolute network priority, and their system expects our VCU to suppress local fault handling during localized synchronization drops so the buses don't hit the emergency brakes in the middle of a public street every time they pass under a bridge or tall building.
+
+If we mark this as a critical bug, it fails the automated delivery pipeline. That means the entire municipal delivery contract stalls. Management wants this pipeline passing green by Friday morning. No exceptions.
+
+--------------------------------------------------------------------------------
+[From: Vance, E. - Senior Optical Systems Group]
+To: Cho, H.; Miller, David
+Subject: RE: Production Release Candidate v3.4.2-Staging [URGENT]
+
+I agree with Cho here. The luminance latency window is narrow—less than half a second under worst-case parameters. The probability of hitting a high-frequency contrast shadow pattern while concurrently dropping a network gateway handshake packet is statistically small.
+
+Nexis is handling the server side. They have assured us that VeloSec’s Overwatch CLI layer maintains a 99.999% uptime on node handoffs across the city grid routes. David, if you are worried about the fallback suppression, leave a comment in the source tree notes during the maintenance cycle to document the architecture requirement. Let’s get this branch merged. We have an IPO timetable to hit.
