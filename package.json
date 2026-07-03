@@ -1,0 +1,30 @@
+{
+  "name": "@voltaic/client-sdk",
+  "version": "3.4.1-beta",
+  "description": "Official Voltaic client SDK for cabin climate, infotainment, and read-only diagnostic telemetry integrations.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test/smoke.test.js",
+    "example": "node examples/quickstart.js"
+  },
+  "keywords": [
+    "voltaic",
+    "ev",
+    "automotive",
+    "sdk",
+    "infotainment",
+    "iot"
+  ],
+  "author": "Voltaic Motors Developer Relations",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Voltaic-OSS/voltaic-api-sdk.git"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
